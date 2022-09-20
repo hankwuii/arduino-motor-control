@@ -1,7 +1,7 @@
 #include <ros.h>
 #include <std_msgs/Int16.h>
 #include <std_msgs/Float32.h>
-#include "motor_server/mysrv.h"
+#include "mysrv.h"
 
 ros::NodeHandle nh;
 using motor_server::mysrv
@@ -15,8 +15,8 @@ ros::Publisher chatter("chatter", &str_msg);
 const int stepPin = 5;
 const int dirPin = 4;
 const int enPin = 8;
-int16 direction;
-float32 angle;
+int16_t direction;
+float32 motor_step;
 
 void setup() {
   nh.initNode();
@@ -27,17 +27,20 @@ void setup() {
   pinMode(dirPin,OUTPUT);
   pinMode(enPin,OUTPUT);
   digitalWrite(enPin,LOW);
-  
 }
 
 void loop() {
   mysrv::Request req;
   mysrv::Response res;
   client.call(req, res);
+  if(direction == 1){
+    digitalWrite(dirPin,HIGH)//CW
+  }
+  else{
+    digitalWrite(dirPin,LOW)//CCW
+  }
   
-  digitalWrite(dirPin,HIGH); //CW
-  
-  for(int x = 0; x < 200; x++) {
+  for(int x = 0; x < motor_step; x++) {
     digitalWrite(stepPin,HIGH);
     delayMicroseconds(1000);
     digitalWrite(stepPin,LOW);
